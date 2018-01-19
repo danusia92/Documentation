@@ -1,0 +1,53 @@
+# Go to MySQL site archive
+- https://downloads.mysql.com/archives/community/
+#
+# Get the MySQL package
+- wget https://downloads.mysql.com/archives/get/file/mysql-community-server-5.7.10-1.el7.x86_64.rpm
+#
+# Verify the integrity of the above file
+- md5sum mysql-community-server-5.7.10-1.el7.x86_64.rpm
+#
+# Remove mariadb libs
+- yum remove mariadb-libs-1:5.5.56-2.el7.x86_64
+- yum remove mariadb-libs-1:5.5.56-2.el7.i686
+#
+# Install the needed files
+- yum install net-tools
+- yum install perl
+- yum install libmysqlclient.so.18
+- yum install mysql-community-common-5.7.10-1.el7.x86_64.rpm
+- yum install mysql-community-libs-5.7.10-1.el7.x86_64.rpm
+- yum install mysql-community-client-5.7.10-1.el7.x86_64.rpm
+#
+# Install the package
+- rpm -ivh mysql-community-server-5.7.10-1.el7.x86_64.rpm
+- yum install mysql-server
+#
+# Start MySQL
+ - systemctl start mysqld
+#
+# Check the status of MySQL
+- systemctl status mysqld
+#
+# Check the temporary password
+- grep 'temporary password' /var/log/mysqld.log - 7g2#G/HbX:o,
+#
+# Secure the installation
+- mysql_secure_installation
+# Disable secure_password for MySQL
+- uninstall plugin validate_password;
+#
+# Log in to MySQL
+- mysqladmin -u root -p version
+#
+# Change port to 3360 instead of 3306
+- vim /etc/my.cnf >> port = 3360
+- systemctl restart mysqld
+- netstat -ntlp
+#
+# Change the logs location
+- vim /etc/my.cnf
+- /var/log/my_location/cafea/mysqld.log to error log field
+#
+# Create MySQL remote user
+- CREATE USER 'test'@'%' IDENTIFIED BY 'testpass';

@@ -1,0 +1,21 @@
+# Update system
+- yum update
+#
+# Upgrade MariaDB
+- vim /etc/yum.repos.d/MariaDB10.repo
+         # MariaDB 10.1 CentOS repository list - created 2016-01-18 09:58 UTC
+         # http://mariadb.org/mariadb/repositories/
+         [mariadb]
+         name = MariaDB
+         baseurl = http://yum.mariadb.org/10.1/centos7-amd64
+         gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+         gpgcheck=1
+#
+# Remove the older version of MariaDB
+- yum remove mariadb-server mariadb mariadb-libs
+#
+# Clean repo cache
+- yum clean all
+#
+# Install new version
+- yum -y install MariaDB-server MariaDB-client 

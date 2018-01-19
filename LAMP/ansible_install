@@ -1,0 +1,46 @@
+# Root login
+- ssh root@server_ip_address
+
+# Create new ansible user
+- adduser ansible
+- passwd ansible #enter passwd for new user
+
+# Root privileges for new user
+- gpasswd -a ansible wheel
+
+# Add public key authentification
+- ssh-keygen
+
+# Copy the public key
+- ssh-copy-id ansible@172.22.150.169
+
+# Or manually install the key
+- cat ~/.ssh/id_rsa.pub
+- select the public key, and copy it to your clipboard
+
+# Add public key to new remote user
+- su - ansible
+- mkdir .ssh
+- chmod 700 .ssh
+- vim .ssh/authorized_keys
+- enter the saved public key
+- save and exit the file
+- chmod 600 .ssh/authorized_keys
+- exit and return to root user
+
+# Configure SSH Daemon
+- vim /etc/ssh/sshd_config
+- disable remote root logins
+           #PermitRootLogin yes - change it to no
+- systemctl reload sshd
+
+# Install Ansible
+- yum install epel-release
+
+# Configure Ansbile hosts
+- vim /etc/ansible/hosts
+     - add [group_name]
+     - alias ansible_ssh_host=my_server_ip
+
+# Ping all servers configured
+- ansible -m ping all

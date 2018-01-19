@@ -1,0 +1,88 @@
+# Install Apache
+- yum install httpd httpd-devel
+- systemctl start httpd
+- systemctl enable httpd
+#
+# Install MariaDB
+- yum install mariadb-server mariadb
+- systemctl start mariadb
+- systemctl enable mariadb
+#
+# Install PHP
+- yum install php-mysql php-pear php-common php-gd php-devel php php-mbstring php-cli
+#
+# Install PHP-SNMP
+- yum install php-snmp
+#
+# Install NET-SNMP
+- yum install net-snmp-utils net-snmp-libs
+#
+# Install RRDTool
+- yum install rrdtool
+#
+# Start SNMP service
+- systemctl start snmpd
+- systemctl enable snmpd
+#
+# Install and enable EPEL repository
+- wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+- rpm -ivh epel-release-latest-7.noarch.rpm
+#
+# Verify repolist
+- yum repolist
+#
+# Install Cacti
+- yum install cacti
+#
+# Configure MySQL server for Cacti installation
+- mysql_secure_installation
+- mysql -u root -p
+            - create database cacti;
+            - create user 'cacti'@'localhost' identified by 'cactipass';
+            - GRANT ALL ON cacti.* TO cacti@localhost IDENTIFIED BY 'cactipass';
+            - FLUSH privileges;
+            - quit
+#
+# Install Cacti tables to MySQL
+- rpm -ql cacti | grep cacti.sql
+- mysql -u cacti -p cacti < /usr/share/doc/cacti-1.1.28/cacti.sql
+#
+# Configure MySQL settings for Cacti
+- vim /etc/cacti/db.php
+          - $database_type     = 'mysql';
+          - $database_default  = 'cacti';
+          - $database_hostname = 'localhost';
+          - $database_username = 'cacti';
+          - $database_password = 'cactipass';
+          - $database_port     = '3306';
+          - $database_ssl      = false;
+#
+# Configure Firewall for Cacti
+- firewall-cmd --permanent --zone=public --add-service=http
+- firewall-cmd --reload
+#
+# Configure Apache server for Cacti
+- vim /etc/httpd/conf.d/cacti.conf
+           - Alias /cacti	/usr/share/cacti
+           - <Directory /usr/share/cacti/>
+           - <IfModule mod_authz_core.c>
+           - # httpd 2.4
+           - Require all granted
+           - </IfModule>
+- systemctl restart httpd
+#
+# Setting Cron for Cacti
+- vim /etc/cron.d/cacti -- uncomment the line
+           - #*/5 * * * *    cacti   /usr/bin/php /usr/share/cacti/poller.php > /dev/null 2>&1
+#
+# Run Cacti installer
+- go to http://172.22.150.105/cacti and follow the installer instructions
+#
+# MySQL timezone config
+- cd /usr/share/mysql
+- mysql -u root -p mysql < mysql_test_data_timezone.sql >> grant access to cacti user as well
+#
+# Configure Cacti
+- echo OPTIONS=\"-LS0-5d -Lf /dev/null -p /var/run/snmpd.pid -x TCP:13371 UDP:13371\" >> /etc/sysconfig/snmpd
+- vim /etc/sysconfig/snmpd
+

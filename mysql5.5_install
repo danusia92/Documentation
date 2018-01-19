@@ -1,0 +1,27 @@
+# Removed version of MySQL 5.6
+
+- yum remove mysql-server mysql
+- mv /var/lib/mysql /var/lib/mysql_old_backup
+- yum remove mysql-community-common-5.6.38-2.el7.x86_64
+
+# Install the required MySQL 5.5 version
+
+- yum install https://downloads.mysql.com/archives/get/file/MySQL-server-5.5.57-1.el7.x86_64.rpm
+- yum install https://downloads.mysql.com/archives/get/file/MySQL-client-5.5.57-1.el7.x86_64.rpm
+
+# Secure installation
+
+- mysql_secure_installation
+
+* Create database and user
+
+- Create database logging;
+- Create user 'logging'@'%' identified by 'AO6fQd69';
+- Grant all privileges on *.* to 'logging'@'%';
+- FLUSH PRIVILEGES;
+- Use logging;
+- Create table info ( timestamp VARCHAR(40) NOT NULL, processes VARCHAR(60) NOT NULL);
+
+# List only Command section of processes
+
+- ps -e -o command or ps -eo %c
